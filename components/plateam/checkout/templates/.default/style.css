@@ -1,0 +1,163 @@
+.plateam-checkout-host {
+  margin: 1rem 0 1.25rem;
+}
+.plateam-checkout-loading h4 {
+  margin: 0 0 0.5rem;
+}
+.plateam-checkout {
+  padding: 1rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #fafafa;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.92),
+    0 2px 12px rgba(0, 0, 0, 0.06);
+}
+.plateam-checkout h4 {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+}
+.plateam-checkout-brand {
+  line-height: 0;
+}
+.plateam-checkout-brand img {
+  display: block;
+  height: 1.25rem;
+  width: auto;
+}
+.plateam-checkout .muted,
+.plateam-checkout.muted-box .muted {
+  color: #666;
+  font-size: 0.875rem;
+}
+.plateam-hint {
+  font-size: 0.8125rem;
+  color: #555;
+  margin: 0 0 0.75rem;
+}
+.plateam-cert-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.plateam-cert-tile {
+  flex: 1 1 140px;
+  min-width: 120px;
+  padding: 0.65rem 0.75rem;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  text-align: center;
+  font: inherit;
+}
+.plateam-cert-tile.is-on {
+  border-color: #1a7a4a;
+  background: #e3f6ea;
+  box-shadow: 0 0 0 2px rgba(45, 106, 79, 0.38);
+}
+.plateam-cert-label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+.plateam-cert-sum {
+  display: block;
+  font-size: 1.05rem;
+  margin: 0.2rem 0;
+}
+.plateam-cert-use {
+  display: block;
+  font-size: 0.75rem;
+  color: #444;
+}
+.plateam-payline {
+  margin: 0;
+  font-size: 0.9375rem;
+}
+.plateam-order-summary {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e0e0e0;
+}
+.plateam-summary-lines {
+  margin: 0 0 0.75rem;
+  padding: 0;
+}
+.plateam-summary-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  margin: 0 0 0.45rem;
+}
+.plateam-summary-row dt {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #444;
+}
+.plateam-summary-row dd {
+  margin: 0;
+  text-align: right;
+  font-size: 0.9375rem;
+}
+.plateam-summary-row--cash dd {
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+.plateam-summary-sub {
+  display: block;
+  font-size: 0.75rem;
+  margin-top: 0.15rem;
+}
+.plateam-issue-block {
+  margin-top: 0.5rem;
+  padding-top: 0.65rem;
+  border-top: 1px dashed #ddd;
+}
+.plateam-issue-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.8125rem;
+  color: #555;
+}
+.plateam-checkout--summary .plateam-order-summary {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0;
+}
+.plateam-total-adjusted {
+  color: #2d6a4f;
+}
+.plateam-cart-cert-note {
+  margin-top: 0.35rem;
+  font-size: 0.8125rem;
+  color: #2d6a4f;
+}
+.plateam-proj {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.875rem;
+}
+
+/* Свой промокод PLATEAM: зелёный статус вместо красного (0% Sale → text-danger). */
+.basket-coupon-alert-section .basket-coupon-alert:has([data-coupon="PLATEAM"]),
+.basket-coupon-alert-section .basket-coupon-alert:has([data-coupon="plateam"]),
+.basket-coupon-section .basket-coupon-alert:has([data-coupon="PLATEAM"]),
+.basket-coupon-section .basket-coupon-alert:has([data-coupon="plateam"]) {
+  color: #198754 !important;
+}
+.basket-coupon-alert-section .basket-coupon-alert:has([data-coupon="PLATEAM"]) .basket-coupon-text,
+.basket-coupon-alert-section .basket-coupon-alert:has([data-coupon="plateam"]) .basket-coupon-text,
+.basket-coupon-alert-section .basket-coupon-alert:has([data-coupon="PLATEAM"]) strong,
+.basket-coupon-alert-section .basket-coupon-alert:has([data-coupon="plateam"]) strong,
+.basket-coupon-alert-section .basket-coupon-alert:has([data-coupon="PLATEAM"]) .close-link,
+.basket-coupon-alert-section .basket-coupon-alert:has([data-coupon="plateam"]) .close-link {
+  color: #198754 !important;
+}
+.basket-coupon-alert.plateam-own-coupon-ok,
+.basket-coupon-alert.plateam-own-coupon-ok .basket-coupon-text,
+.basket-coupon-alert.plateam-own-coupon-ok strong,
+.basket-coupon-alert.plateam-own-coupon-ok .close-link {
+  color: #198754 !important;
+}
