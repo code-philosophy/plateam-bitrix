@@ -16,7 +16,6 @@ require_once __DIR__ . '/lib/OrderPropertyInstaller.php';
 require_once __DIR__ . '/lib/EventHandlers.php';
 require_once __DIR__ . '/lib/BasketTotal.php';
 require_once __DIR__ . '/lib/OrderDiscount.php';
-require_once __DIR__ . '/lib/PaySystemInstaller.php';
 require_once __DIR__ . '/lib/PromoBridge.php';
 
 Bitrix\Main\Loader::registerAutoLoadClasses('plateam.partner', [
@@ -30,7 +29,6 @@ Bitrix\Main\Loader::registerAutoLoadClasses('plateam.partner', [
     'Plateam\\Partner\\EventHandlers' => 'lib/EventHandlers.php',
     'Plateam\\Partner\\BasketTotal' => 'lib/BasketTotal.php',
     'Plateam\\Partner\\OrderDiscount' => 'lib/OrderDiscount.php',
-    'Plateam\\Partner\\PaySystemInstaller' => 'lib/PaySystemInstaller.php',
     'Plateam\\Partner\\PromoBridge' => 'lib/PromoBridge.php',
 ]);
 

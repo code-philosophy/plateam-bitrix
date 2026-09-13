@@ -13,8 +13,8 @@
     var summaryOnly = mode === 'summary';
     var promoOwn = root.getAttribute('data-promo-own') === '1';
     var promoNeedsActivation = root.getAttribute('data-promo-needs-activation') === '1';
-    var promoActivateRef = root.getAttribute('data-promo-activate-ref') || 'demo-ref-north';
-    var promoOwnCode = (root.getAttribute('data-promo-own-code') || 'PLATEAM').toUpperCase();
+    var promoActivateRef = root.getAttribute('data-promo-activate-ref') || '';
+    var promoOwnCode = (root.getAttribute('data-promo-own-code') || '').toUpperCase();
     var promoStatusUrl =
       root.getAttribute('data-promo-status-url') ||
       '/local/modules/plateam.partner/tools/promo_status.php';
@@ -261,7 +261,7 @@
     }
 
     function hasForeignCouponInDom() {
-      var foreign = normalizeCouponCode(root.getAttribute('data-promo-foreign-code') || 'SHOP10');
+      var foreign = normalizeCouponCode(root.getAttribute('data-promo-foreign-code') || '');
       var codes = collectAppliedCouponCodes();
       for (var i = 0; i < codes.length; i++) {
         if (codes[i] === promoOwnCode) continue;

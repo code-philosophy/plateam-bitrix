@@ -21,7 +21,7 @@ class Config
     public static function platformOrigin(): string
     {
         $v = trim((string) Option::get(self::MODULE_ID, 'platform_origin', 'https://pla.team'));
-        return rtrim($v, '/');
+        return rtrim($v !== '' ? $v : 'https://pla.team', '/');
     }
 
     public static function apiBase(): string
@@ -35,7 +35,7 @@ class Config
 
     public static function widgetVersion(): string
     {
-        return trim((string) Option::get(self::MODULE_ID, 'widget_version', '20260913h'));
+        return trim((string) Option::get(self::MODULE_ID, 'widget_version', '1.0.0'));
     }
 
     /** Origin витрины для Partner API (header Origin). */
@@ -55,40 +55,41 @@ class Config
         return self::apiKey() !== '' && self::partnerCode() !== '' && self::platformOrigin() !== '';
     }
 
-    /** Наш демо-промокод (активация сети, без денежной скидки Sale). */
+    /** Собственный промокод партнёра (активация сети). Пусто = не задан. */
     public static function ownPromoCode(): string
     {
-        $v = trim((string) Option::get(self::MODULE_ID, 'own_promo_code', 'PLATEAM'));
-        return $v !== '' ? strtoupper($v) : 'PLATEAM';
+        return strtoupper(trim((string) Option::get(self::MODULE_ID, 'own_promo_code', '')));
     }
 
-    /** Чужой демо-промокод магазина (−10%). */
+    /** Чужой промокод магазина (скидка Sale). Пусто = не задан. */
     public static function foreignPromoCode(): string
     {
-        $v = trim((string) Option::get(self::MODULE_ID, 'foreign_promo_code', 'SHOP10'));
-        return $v !== '' ? strtoupper($v) : 'SHOP10';
+        return strtoupper(trim((string) Option::get(self::MODULE_ID, 'foreign_promo_code', '')));
     }
 
-    /** Реф-токен go для east / партнёра north. */
+    /** Токен реферальной ссылки go (/r/{token}). */
     public static function demoRefToken(): string
     {
-        $v = trim((string) Option::get(self::MODULE_ID, 'demo_ref_token', 'demo-ref-north'));
-        return $v !== '' ? $v : 'demo-ref-north';
+        return trim((string) Option::get(self::MODULE_ID, 'demo_ref_token', ''));
     }
 
     public static function goOrigin(): string
     {
-        $v = trim((string) Option::get(self::MODULE_ID, 'go_origin', 'https://go.demo.pla.team'));
-        return rtrim($v !== '' ? $v : 'https://go.demo.pla.team', '/');
+        $v = trim((string) Option::get(self::MODULE_ID, 'go_origin', 'https://go.pla.team'));
+        return rtrim($v !== '' ? $v : 'https://go.pla.team', '/');
     }
 
     public static function goReferralUrl(): string
     {
-        return self::goOrigin() . '/r/' . rawurlencode(self::demoRefToken());
+        $token = self::demoRefToken();
+        if ($token === '') {
+            return '';
+        }
+        return self::goOrigin() . '/r/' . rawurlencode($token);
     }
 
     /**
-     * Галочка модуля: чужой промокод не суммируется с рефералкой / своим PLATEAM.
+     * Галочка модуля: чужой промокод не суммируется с рефералкой / своим промо.
      * По умолчанию включено (Y).
      */
     public static function blockForeignWithReferral(): bool

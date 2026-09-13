@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Staging / pilot bootstrap only — seeds demo.pla.team + north.
- * Production partners: install via admin UI and set options to https://pla.team.
- * Open once: /local/modules/plateam.partner/tools/web_install.php
+ * Pilot / staging bootstrap only (east).
+ * Copy this file to the site if needed — it is NOT part of the marketplace module package.
+ * Seeds demo.pla.team + partner north.
  */
 
 define('NO_KEEP_STATISTIC', true);
@@ -15,7 +15,6 @@ use Bitrix\Main\Config\Option;
 use Bitrix\Main\Loader;
 use Bitrix\Main\ModuleManager;
 use Plateam\Partner\OrderPropertyInstaller;
-use Plateam\Partner\PaySystemInstaller;
 
 header('Content-Type: text/plain; charset=utf-8');
 
@@ -29,6 +28,11 @@ if (!is_file($_SERVER['DOCUMENT_ROOT'] . '/local/modules/plateam.partner/include
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/local/modules/plateam.partner/include.php';
 
+$paySystemInstaller = dirname(__DIR__) . '/PaySystemInstaller.php';
+if (is_file($paySystemInstaller)) {
+    require_once $paySystemInstaller;
+}
+
 if (!ModuleManager::isModuleInstalled($moduleId)) {
     ModuleManager::registerModule($moduleId);
     $steps[] = 'registered module';
@@ -39,10 +43,12 @@ if (!ModuleManager::isModuleInstalled($moduleId)) {
 if (Loader::includeModule('sale')) {
     OrderPropertyInstaller::install();
     $steps[] = 'order properties ensured';
-    try {
-        $steps = array_merge($steps, PaySystemInstaller::install());
-    } catch (\Throwable $e) {
-        $steps[] = 'pay system ERROR: ' . $e->getMessage();
+    if (class_exists(\Plateam\Partner\PaySystemInstaller::class)) {
+        try {
+            $steps = array_merge($steps, \Plateam\Partner\PaySystemInstaller::install());
+        } catch (\Throwable $e) {
+            $steps[] = 'pay system ERROR: ' . $e->getMessage();
+        }
     }
 }
 
@@ -50,7 +56,11 @@ $defaults = [
     'partner_code' => 'north',
     'platform_origin' => 'https://app.demo.pla.team',
     'api_base' => 'https://app.demo.pla.team/api/v0',
-    'widget_version' => '20260818',
+    'go_origin' => 'https://go.demo.pla.team',
+    'demo_ref_token' => 'demo-ref-north',
+    'own_promo_code' => 'PLATEAM',
+    'foreign_promo_code' => 'SHOP10',
+    'widget_version' => '1.0.0',
     'api_key' => '',
 ];
 foreach ($defaults as $key => $value) {
@@ -59,12 +69,11 @@ foreach ($defaults as $key => $value) {
     }
 }
 
-// Staging demo key for partner north (override in module settings UI).
 if (Option::get($moduleId, 'api_key', '') === '') {
     Option::set($moduleId, 'api_key', 'demo-north-key');
 }
 
-$steps[] = 'options ok';
+$steps[] = 'options ok (demo contour)';
 
 echo implode("\n", $steps) . "\n";
 echo "Done. Remove or protect this script after use.\n";

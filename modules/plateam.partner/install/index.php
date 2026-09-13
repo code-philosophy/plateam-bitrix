@@ -2,7 +2,6 @@
 
 use Bitrix\Main\Localization\Loc;
 use Bitrix\Main\ModuleManager;
-use Plateam\Partner\OrderPropertyInstaller;
 
 Loc::loadMessages(__FILE__);
 
@@ -22,29 +21,32 @@ class plateam_partner extends CModule
         include __DIR__ . '/version.php';
         $this->MODULE_VERSION = $arModuleVersion['VERSION'];
         $this->MODULE_VERSION_DATE = $arModuleVersion['VERSION_DATE'];
-        $this->MODULE_NAME = 'PLATEAM Partner';
-        $this->MODULE_DESCRIPTION = 'Интеграция интернет-магазина с PLATEAM (виджет + Partner API v0)';
+        $this->MODULE_NAME = Loc::getMessage('PLATEAM_PARTNER_MODULE_NAME') ?: 'PLATEAM Partner';
+        $this->MODULE_DESCRIPTION = Loc::getMessage('PLATEAM_PARTNER_MODULE_DESC')
+            ?: 'Connect Bitrix store to PLATEAM (widget + Partner API)';
     }
 
     public function DoInstall()
     {
         global $APPLICATION;
         if (!CheckVersion(ModuleManager::getVersion('main'), '20.0.0')) {
-            $APPLICATION->ThrowException('Требуется main >= 20.0.0');
+            $APPLICATION->ThrowException(Loc::getMessage('PLATEAM_PARTNER_ERR_MAIN') ?: 'Requires main >= 20.0.0');
             return false;
         }
         if (!ModuleManager::isModuleInstalled('sale')) {
-            $APPLICATION->ThrowException('Требуется модуль sale');
+            $APPLICATION->ThrowException(Loc::getMessage('PLATEAM_PARTNER_ERR_SALE') ?: 'Requires sale module');
             return false;
         }
         ModuleManager::registerModule($this->MODULE_ID);
         $this->InstallDB();
         $this->InstallEvents();
+        $this->InstallFiles();
         return true;
     }
 
     public function DoUninstall()
     {
+        $this->UnInstallFiles();
         $this->UnInstallEvents();
         $this->UnInstallDB();
         ModuleManager::unRegisterModule($this->MODULE_ID);
@@ -56,7 +58,8 @@ class plateam_partner extends CModule
         if (!\Bitrix\Main\Loader::includeModule('sale')) {
             return false;
         }
-        OrderPropertyInstaller::install();
+        require_once dirname(__DIR__) . '/lib/OrderPropertyInstaller.php';
+        \Plateam\Partner\OrderPropertyInstaller::install();
         return true;
     }
 
@@ -72,6 +75,23 @@ class plateam_partner extends CModule
 
     public function UnInstallEvents()
     {
+        return true;
+    }
+
+    public function InstallFiles()
+    {
+        CopyDirFiles(
+            __DIR__ . '/components',
+            $_SERVER['DOCUMENT_ROOT'] . '/local/components',
+            true,
+            true
+        );
+        return true;
+    }
+
+    public function UnInstallFiles()
+    {
+        DeleteDirFilesEx('/local/components/plateam');
         return true;
     }
 }

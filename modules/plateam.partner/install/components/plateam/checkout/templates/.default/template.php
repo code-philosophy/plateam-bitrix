@@ -18,8 +18,8 @@ if (!in_array($mode, ['cart', 'summary'], true)) {
 
 $promoOwn = !empty($arResult['PROMO_OWN_APPLIED']);
 $promoNeeds = !empty($arResult['PROMO_NEEDS_ACTIVATION']);
-$activateRef = (string) ($arResult['PROMO_ACTIVATE_REF'] ?? 'demo-ref-north');
-$ownCode = (string) ($arResult['PROMO_OWN_CODE'] ?? 'PLATEAM');
+$activateRef = (string) ($arResult['PROMO_ACTIVATE_REF'] ?? '');
+$ownCode = (string) ($arResult['PROMO_OWN_CODE'] ?? '');
 
 $this->addExternalCss($templateFolder . '/style.css');
 $scriptUrl = $templateFolder . '/script.js?v=20260913e';
@@ -39,7 +39,7 @@ $brandSrc = $platformOrigin !== ''
   data-promo-needs-activation="<?= $promoNeeds ? '1' : '0' ?>"
   data-promo-activate-ref="<?= htmlspecialcharsbx($activateRef) ?>"
   data-promo-own-code="<?= htmlspecialcharsbx($ownCode) ?>"
-  data-promo-foreign-code="<?= htmlspecialcharsbx((string) ($arResult['PROMO_FOREIGN_CODE'] ?? 'SHOP10')) ?>"
+  data-promo-foreign-code="<?= htmlspecialcharsbx((string) ($arResult['PROMO_FOREIGN_CODE'] ?? '')) ?>"
   data-promo-status-url="/local/modules/plateam.partner/tools/promo_status.php"
 >
   <div class="plateam-checkout plateam-checkout-loading">

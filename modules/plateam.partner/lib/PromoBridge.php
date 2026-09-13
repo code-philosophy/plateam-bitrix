@@ -6,11 +6,11 @@ use Bitrix\Main\Loader;
 use Bitrix\Sale\DiscountCouponsManager;
 
 /**
- * Демо-промокоды east — алгоритм:
+ * Промокоды партнёра (настраиваются в options модуля):
  *
- * 1) Silent (нет рефа / своего промо) → чужой SHOP10 работает как обычная скидка.
- * 2) Свой PLATEAM → активирует сеть (pla_ref).
- * 3) Если в настройках модуля включено «не суммировать с рефералкой» (default ON)
+ * 1) Нет рефа / своего промо → чужой foreign_promo_code работает как обычная скидка.
+ * 2) Свой own_promo_code → активирует сеть (pla_ref).
+ * 3) Если включено «не суммировать с рефералкой» (default ON)
  *    и сеть активна / свой промо → чужие купоны снимаются.
  */
 class PromoBridge
@@ -52,6 +52,9 @@ class PromoBridge
     public static function hasOwnCouponNow(): bool
     {
         $ownCode = self::ownCouponCode();
+        if ($ownCode === '') {
+            return false;
+        }
         foreach (self::listAppliedCodes() as $code) {
             if (self::codesEqual($code, $ownCode)) {
                 return true;

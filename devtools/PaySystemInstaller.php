@@ -52,7 +52,7 @@ class PaySystemInstaller
 
     private static function copyHandlerFiles(): void
     {
-        $src = dirname(__DIR__) . '/install/sale_payment/' . self::HANDLER_CODE;
+        $src = __DIR__ . '/sale_payment/' . self::HANDLER_CODE;
         $dst = $_SERVER['DOCUMENT_ROOT'] . '/local/php_interface/include/sale_payment/' . self::HANDLER_CODE;
         if (!is_dir($src)) {
             throw new \RuntimeException('Handler source missing: ' . $src);
