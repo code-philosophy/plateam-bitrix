@@ -18,6 +18,8 @@ class SessionBridge
         'paidSent' => 'PLATEAM_PAID_SENT',
         /** JSON {"sesKop":N,"uesKop":N} from orders/paid — for finish modal */
         'issued' => 'PLATEAM_ISSUED',
+        /** Short-lived widget checkout token (wt_…) for POST /holds */
+        'checkoutToken' => 'PLATEAM_CHECKOUT_TOKEN',
     ];
 
     public static function stashCheckout(array $data): void
@@ -49,14 +51,29 @@ class SessionBridge
         if ($userId === '') {
             $userId = (string) ($prev['userId'] ?? '');
         }
+        $checkoutToken = trim((string) ($data['checkoutToken'] ?? ''));
+        if ($checkoutToken === '') {
+            $checkoutToken = (string) ($prev['checkoutToken'] ?? '');
+        }
         $_SESSION[self::SESSION_KEY] = [
             'visitorId' => $visitorId,
             'userId' => $userId,
+            'checkoutToken' => $checkoutToken,
             'sesKop' => $incomingSes,
             'uesKop' => $incomingUes,
             'useSes' => $useSes,
             'useUes' => $useUes,
         ];
+    }
+
+    /** True hold id from order props (ignores E: diagnostic markers). */
+    public static function resolvedHoldId(array $props): string
+    {
+        $holdId = trim((string) ($props['holdId'] ?? ''));
+        if ($holdId === '' || str_starts_with($holdId, 'E:')) {
+            return '';
+        }
+        return $holdId;
     }
 
     /** Только читает stash — не снимает (SOA сохраняет заказ несколько раз). */

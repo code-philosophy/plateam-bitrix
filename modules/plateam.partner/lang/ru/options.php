@@ -2,9 +2,9 @@
 
 $MESS['PLATEAM_PARTNER_OPTIONS_TITLE'] = 'PLATEAM Partner';
 $MESS['PLATEAM_PARTNER_OPT_PARTNER_CODE'] = 'Partner code';
-$MESS['PLATEAM_PARTNER_OPT_API_KEY'] = 'API key (server-side only)';
-$MESS['PLATEAM_PARTNER_OPT_PLATFORM'] = 'Platform origin (production: https://pla.team)';
-$MESS['PLATEAM_PARTNER_OPT_API_BASE'] = 'Partner API base URL';
+$MESS['PLATEAM_PARTNER_OPT_API_KEY'] = 'API key (pk_test_ / pk_live_, server-side only)';
+$MESS['PLATEAM_PARTNER_OPT_PLATFORM'] = 'Platform origin (always https://pla.team)';
+$MESS['PLATEAM_PARTNER_OPT_API_BASE'] = 'Partner API base URL (https://pla.team/api/v0)';
 $MESS['PLATEAM_PARTNER_OPT_GO_ORIGIN'] = 'Referral redirector origin (go)';
 $MESS['PLATEAM_PARTNER_OPT_REF_TOKEN'] = 'Referral token (go /r/{token})';
 $MESS['PLATEAM_PARTNER_OPT_OWN_PROMO'] = 'Own promo code (network activation)';

@@ -17,6 +17,7 @@ class OrderPropertyInstaller
         ['CODE' => 'PLATEAM_CASH_KOP', 'NAME' => 'PLATEAM cash (коп.)', 'TYPE' => 'STRING', 'DEFAULT' => '0'],
         ['CODE' => 'PLATEAM_PAID_SENT', 'NAME' => 'PLATEAM paid sent', 'TYPE' => 'STRING', 'DEFAULT' => ''],
         ['CODE' => 'PLATEAM_ISSUED', 'NAME' => 'PLATEAM issued (JSON)', 'TYPE' => 'STRING', 'DEFAULT' => ''],
+        ['CODE' => 'PLATEAM_CHECKOUT_TOKEN', 'NAME' => 'PLATEAM checkoutToken', 'TYPE' => 'STRING', 'DEFAULT' => ''],
     ];
 
     public static function install(): void

@@ -13,6 +13,8 @@ require_once __DIR__ . '/lib/OrderSync.php';
 require_once __DIR__ . '/lib/ReturnNotify.php';
 require_once __DIR__ . '/lib/SessionBridge.php';
 require_once __DIR__ . '/lib/OrderPropertyInstaller.php';
+require_once __DIR__ . '/lib/OptionsMigrator.php';
+require_once __DIR__ . '/lib/ToolsAuth.php';
 require_once __DIR__ . '/lib/EventHandlers.php';
 require_once __DIR__ . '/lib/BasketTotal.php';
 require_once __DIR__ . '/lib/OrderDiscount.php';
@@ -26,6 +28,8 @@ Bitrix\Main\Loader::registerAutoLoadClasses('plateam.partner', [
     'Plateam\\Partner\\ReturnNotify' => 'lib/ReturnNotify.php',
     'Plateam\\Partner\\SessionBridge' => 'lib/SessionBridge.php',
     'Plateam\\Partner\\OrderPropertyInstaller' => 'lib/OrderPropertyInstaller.php',
+    'Plateam\\Partner\\OptionsMigrator' => 'lib/OptionsMigrator.php',
+    'Plateam\\Partner\\ToolsAuth' => 'lib/ToolsAuth.php',
     'Plateam\\Partner\\EventHandlers' => 'lib/EventHandlers.php',
     'Plateam\\Partner\\BasketTotal' => 'lib/BasketTotal.php',
     'Plateam\\Partner\\OrderDiscount' => 'lib/OrderDiscount.php',

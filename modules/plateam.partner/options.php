@@ -16,9 +16,16 @@ if ($REQUEST_METHOD === 'POST' && check_bitrix_sessid()) {
         );
         $result = $client->partnersMe();
         if ($result['ok']) {
+            $body = is_array($result['body'] ?? null) ? $result['body'] : [];
+            $code = (string) ($body['code'] ?? 'partner');
+            $keyEnv = trim((string) ($body['keyEnv'] ?? ''));
+            $msg = 'OK: ' . $code;
+            if ($keyEnv !== '') {
+                $msg .= ' (keyEnv=' . $keyEnv . ')';
+            }
             CAdminMessage::ShowMessage([
                 'TYPE' => 'OK',
-                'MESSAGE' => 'OK: ' . ($result['body']['code'] ?? 'partner'),
+                'MESSAGE' => $msg,
             ]);
         } else {
             CAdminMessage::ShowMessage([

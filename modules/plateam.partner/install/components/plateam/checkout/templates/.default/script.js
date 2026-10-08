@@ -344,12 +344,16 @@
     }
 
     function postPromoStatus(payload) {
+      var body = Object.assign({}, payload || {}, { sessid: bitrixSessid() });
       return fetch(promoStatusUrl, {
         method: 'POST',
         credentials: 'same-origin',
         cache: 'no-store',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload || {}),
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Bitrix-Csrf-Token': bitrixSessid(),
+        },
+        body: JSON.stringify(body),
       }).then(function (r) {
         return r.json();
       });
@@ -933,16 +937,27 @@
       renderTiles(session);
     }
 
+    function bitrixSessid() {
+      try {
+        if (window.BX && typeof window.BX.bitrix_sessid === 'function') {
+          return String(window.BX.bitrix_sessid() || '');
+        }
+      } catch (e) {}
+      return '';
+    }
+
     function stashPayload(session) {
       var u = calcUse(session);
       return {
         visitorId: session.visitorId || '',
         userId: session.userId || '',
+        checkoutToken: session.checkoutToken || '',
         sesKop: u.sesKop,
         uesKop: u.uesKop,
         useSes: pick.ses,
         useUes: pick.ues,
         orderTotalKop: effectiveOrderTotalKop(),
+        sessid: bitrixSessid(),
       };
     }
 
@@ -950,7 +965,7 @@
       if (!stashUrl || !session) return Promise.resolve();
       return fetch(stashUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'X-Bitrix-Csrf-Token': bitrixSessid() },
         credentials: 'same-origin',
         body: JSON.stringify(stashPayload(session)),
       }).catch(function () {});
@@ -970,7 +985,10 @@
       }
       fetch(stashUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'X-Bitrix-Csrf-Token': bitrixSessid(),
+        },
         credentials: 'same-origin',
         body: params.toString(),
         keepalive: true,

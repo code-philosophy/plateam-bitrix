@@ -2,6 +2,7 @@
 
 use Bitrix\Main\Loader;
 use Plateam\Partner\SessionBridge;
+use Plateam\Partner\ToolsAuth;
 
 define('NO_KEEP_STATISTIC', true);
 define('NOT_CHECK_PERMISSIONS', true);
@@ -33,9 +34,16 @@ if (!is_array($data)) {
     die();
 }
 
+if (!empty($data['sessid']) && is_string($data['sessid'])) {
+    $_REQUEST['sessid'] = $data['sessid'];
+    $_POST['sessid'] = $data['sessid'];
+}
+ToolsAuth::requireSessid();
+
 SessionBridge::stashCheckout([
     'visitorId' => $data['visitorId'] ?? '',
     'userId' => $data['userId'] ?? '',
+    'checkoutToken' => $data['checkoutToken'] ?? '',
     'sesKop' => (int) ($data['sesKop'] ?? 0),
     'uesKop' => (int) ($data['uesKop'] ?? 0),
     'useSes' => !empty($data['useSes']),

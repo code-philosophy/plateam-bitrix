@@ -14,12 +14,23 @@ class HoldService
     public function createHold(array $params): array
     {
         $orderId = (string) ($params['orderId'] ?? '');
+        $checkoutToken = trim((string) ($params['checkoutToken'] ?? ''));
+        if ($checkoutToken === '') {
+            return [
+                'ok' => false,
+                'status' => 0,
+                'error' => 'missing_checkout_token',
+                'body' => null,
+                'raw' => null,
+            ];
+        }
         $body = [
             'visitorId' => $params['visitorId'] ?? null,
             'userId' => $params['userId'] ?? null,
             'orderId' => $orderId,
             'sesKop' => (int) ($params['sesKop'] ?? 0),
             'uesKop' => (int) ($params['uesKop'] ?? 0),
+            'checkoutToken' => $checkoutToken,
             'operationId' => $params['operationId'] ?? ('hold-' . $orderId),
         ];
         $idempotency = $params['idempotencyKey'] ?? $body['operationId'];

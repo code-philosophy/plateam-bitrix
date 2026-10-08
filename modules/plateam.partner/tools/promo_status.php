@@ -15,6 +15,7 @@ require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.
 
 use Bitrix\Main\Loader;
 use Plateam\Partner\PromoBridge;
+use Plateam\Partner\ToolsAuth;
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -36,7 +37,16 @@ if ($input === [] && !empty($_POST) && is_array($_POST)) {
     $input = $_POST;
 }
 
-if (!empty($input['networkActive'])) {
+$isMutation = !empty($input['networkActive']);
+if ($isMutation) {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        ToolsAuth::deny('method_not_allowed', 405);
+    }
+    if (!empty($input['sessid']) && is_string($input['sessid'])) {
+        $_REQUEST['sessid'] = $input['sessid'];
+        $_POST['sessid'] = $input['sessid'];
+    }
+    ToolsAuth::requireSessid();
     PromoBridge::markNetworkActive();
 }
 

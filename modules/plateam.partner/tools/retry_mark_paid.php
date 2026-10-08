@@ -3,6 +3,7 @@
 use Bitrix\Main\Loader;
 use Plateam\Partner\EventHandlers;
 use Plateam\Partner\SessionBridge;
+use Plateam\Partner\ToolsAuth;
 
 define('NO_KEEP_STATISTIC', true);
 define('NOT_CHECK_PERMISSIONS', true);
@@ -16,6 +17,9 @@ if (!Loader::includeModule('sale') || !Loader::includeModule('plateam.partner'))
     echo json_encode(['error' => 'modules_not_loaded']);
     die();
 }
+
+ToolsAuth::requireAdmin();
+ToolsAuth::requireSessid();
 
 $orderId = isset($_REQUEST['order_id']) ? (int) $_REQUEST['order_id'] : 0;
 if ($orderId <= 0) {

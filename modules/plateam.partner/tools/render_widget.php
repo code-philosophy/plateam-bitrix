@@ -1,5 +1,7 @@
 <?php
 
+use Plateam\Partner\ToolsAuth;
+
 define('NO_KEEP_STATISTIC', true);
 define('NOT_CHECK_PERMISSIONS', true);
 
@@ -10,6 +12,8 @@ if (!\Bitrix\Main\Loader::includeModule('plateam.partner')) {
     echo 'module not loaded';
     die();
 }
+
+ToolsAuth::requireAdmin();
 
 $APPLICATION->IncludeComponent('plateam:widget', '', [], false);
 

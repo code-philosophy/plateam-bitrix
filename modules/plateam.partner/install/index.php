@@ -55,6 +55,10 @@ class plateam_partner extends CModule
 
     public function InstallDB()
     {
+        require_once dirname(__DIR__) . '/lib/Config.php';
+        require_once dirname(__DIR__) . '/lib/OptionsMigrator.php';
+        \Plateam\Partner\OptionsMigrator::migrate();
+
         if (!\Bitrix\Main\Loader::includeModule('sale')) {
             return false;
         }

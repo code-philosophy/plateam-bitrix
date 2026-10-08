@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Internal connectivity check. Uses module Config (pla.team by default).
+ * Not part of the marketplace package.
+ */
+
 define('NO_KEEP_STATISTIC', true);
 define('NOT_CHECK_PERMISSIONS', true);
 
@@ -7,44 +12,25 @@ require $_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.
 
 header('Content-Type: application/json; charset=utf-8');
 
-$url = 'https://app.demo.pla.team/api/v0/partners/me';
-$key = \Bitrix\Main\Config\Option::get('plateam.partner', 'api_key', '');
-
-$headers = [
-    'Authorization: Bearer ' . $key,
-    'Accept: application/json',
-    'Origin: https://east.evosreda.ru',
-];
-
-$ctx = stream_context_create([
-    'http' => [
-        'method' => 'GET',
-        'header' => implode("\r\n", $headers),
-        'timeout' => 8,
-        'ignore_errors' => true,
-    ],
-    'ssl' => [
-        'verify_peer' => true,
-        'verify_peer_name' => true,
-    ],
-]);
-
-$err = null;
-$raw = @file_get_contents($url, false, $ctx);
-if ($raw === false) {
-    $err = error_get_last()['message'] ?? 'file_get_contents failed';
+if (!\Bitrix\Main\Loader::includeModule('plateam.partner')) {
+    echo json_encode(['error' => 'module_not_loaded'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    die();
 }
 
-$status = 0;
-if (isset($http_response_header[0]) && preg_match('/\s(\d{3})\s/', $http_response_header[0], $m)) {
-    $status = (int) $m[1];
-}
+use Plateam\Partner\ApiClient;
+use Plateam\Partner\Config;
+
+$client = new ApiClient();
+$result = $client->partnersMe();
 
 echo json_encode([
-    'url' => $url,
-    'hasKey' => $key !== '',
-    'status' => $status,
-    'error' => $err,
-    'bodyHead' => $raw === false ? null : substr($raw, 0, 200),
-    'allowUrlFopen' => ini_get('allow_url_fopen'),
+    'url' => Config::apiBase() . '/partners/me',
+    'platformOrigin' => Config::platformOrigin(),
+    'siteOrigin' => Config::siteOrigin(),
+    'hasKey' => Config::apiKey() !== '',
+    'status' => $result['status'],
+    'ok' => $result['ok'],
+    'error' => $result['error'] ?? null,
+    'body' => $result['body'],
+    'bodyHead' => is_string($result['raw'] ?? null) ? substr($result['raw'], 0, 200) : null,
 ], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);

@@ -273,7 +273,7 @@ class EventHandlers
                 'visitorId' => $visitorId !== '' ? $visitorId : null,
                 'userId' => $userId !== '' ? $userId : null,
                 'cashKop' => $cashKop,
-                'holdId' => trim((string) ($props['holdId'] ?? '')) ?: null,
+                'holdId' => SessionBridge::resolvedHoldId($props) ?: null,
             ]);
 
             if ($result['ok']) {
@@ -337,7 +337,10 @@ class EventHandlers
         $needCert = ((int) ($props['sesKop'] ?? 0) + (int) ($props['uesKop'] ?? 0)) <= 0
             && $checkout
             && ((int) ($checkout['sesKop'] ?? 0) + (int) ($checkout['uesKop'] ?? 0)) > 0;
-        if (!$checkout || (!$needVisitor && !$needCert)) {
+        $needToken = trim((string) ($props['checkoutToken'] ?? '')) === ''
+            && $checkout
+            && trim((string) ($checkout['checkoutToken'] ?? '')) !== '';
+        if (!$checkout || (!$needVisitor && !$needCert && !$needToken)) {
             return;
         }
 
@@ -350,9 +353,24 @@ class EventHandlers
     {
         $sesKop = (int) ($props['sesKop'] ?? 0);
         $uesKop = (int) ($props['uesKop'] ?? 0);
-        $holdId = trim((string) ($props['holdId'] ?? ''));
+        $holdId = SessionBridge::resolvedHoldId($props);
         $visitorId = trim((string) ($props['visitorId'] ?? ''));
         if (($sesKop + $uesKop) <= 0 || $holdId !== '' || $visitorId === '') {
+            return;
+        }
+
+        $checkoutToken = trim((string) ($props['checkoutToken'] ?? ''));
+        if ($checkoutToken === '') {
+            $checkout = SessionBridge::peekCheckout();
+            $checkoutToken = trim((string) ($checkout['checkoutToken'] ?? ''));
+        }
+        if ($checkoutToken === '') {
+            SessionBridge::writeOrderProp(
+                $order,
+                SessionBridge::PROP_CODES['holdId'],
+                'E:missing_checkout_token'
+            );
+            $order->save();
             return;
         }
 
@@ -363,18 +381,31 @@ class EventHandlers
             'userId' => trim((string) ($props['userId'] ?? '')) ?: null,
             'sesKop' => $sesKop,
             'uesKop' => $uesKop,
+            'checkoutToken' => $checkoutToken,
         ]);
 
         if ($hold['ok'] && is_array($hold['body']) && !empty($hold['body']['holdId'])) {
             SessionBridge::writeOrderProp($order, SessionBridge::PROP_CODES['holdId'], (string) $hold['body']['holdId']);
             $order->save();
+            return;
         }
+
+        $err = self::formatApiError($hold);
+        SessionBridge::writeOrderProp(
+            $order,
+            SessionBridge::PROP_CODES['holdId'],
+            'E:' . substr($err, 0, 40)
+        );
+        $order->save();
     }
 
     private static function applyCheckoutToOrder(\Bitrix\Sale\Order $order, array $checkout): void
     {
+        OrderPropertyInstaller::install();
+
         $visitorId = trim((string) ($checkout['visitorId'] ?? ''));
         $userId = trim((string) ($checkout['userId'] ?? ''));
+        $checkoutToken = trim((string) ($checkout['checkoutToken'] ?? ''));
         $orderTotalKop = SessionBridge::rubToKop($order->getPrice());
         $amounts = OrderDiscount::normalizeAmounts(
             $orderTotalKop,
@@ -387,6 +418,9 @@ class EventHandlers
         }
         if ($userId !== '') {
             SessionBridge::writeOrderProp($order, SessionBridge::PROP_CODES['userId'], $userId);
+        }
+        if ($checkoutToken !== '') {
+            SessionBridge::writeOrderProp($order, SessionBridge::PROP_CODES['checkoutToken'], $checkoutToken);
         }
         SessionBridge::writeOrderProp($order, SessionBridge::PROP_CODES['sesKop'], (string) $amounts['sesKop']);
         SessionBridge::writeOrderProp($order, SessionBridge::PROP_CODES['uesKop'], (string) $amounts['uesKop']);
