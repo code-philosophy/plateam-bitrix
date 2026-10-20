@@ -8,7 +8,7 @@
 
 | | |
 | --- | --- |
-| Версия | **1.1.3** |
+| Версия | **1.1.4** |
 | MODULE_ID | `plateam.partner` |
 | Совместимость | PHP **7.4+**, Bitrix **main ≥ 18.0.0**, модуль **sale** |
 | Репозиторий | [code-philosophy/plateam-bitrix](https://github.com/code-philosophy/plateam-bitrix) |
