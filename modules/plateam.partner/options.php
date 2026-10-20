@@ -1,6 +1,7 @@
 <?php
 
 use Bitrix\Main\Config\Option;
+use Bitrix\Main\Loader;
 use Bitrix\Main\Localization\Loc;
 use Plateam\Partner\ApiClient;
 use Plateam\Partner\Config;
@@ -8,11 +9,16 @@ use Plateam\Partner\Config;
 $moduleId = 'plateam.partner';
 Loc::loadMessages(__FILE__);
 
+if (!Loader::includeModule($moduleId)) {
+    ShowError('Module plateam.partner is not installed');
+    return;
+}
+
 if ($REQUEST_METHOD === 'POST' && check_bitrix_sessid()) {
     if (isset($_POST['test_api'])) {
         $client = new ApiClient(
             $_POST['api_base'] ?: Config::apiBase(),
-            $_POST['api_key'] ?: Config::apiKey(),
+            $_POST['api_key'] ?: Config::apiKey()
         );
         $result = $client->partnersMe();
         if ($result['ok']) {
