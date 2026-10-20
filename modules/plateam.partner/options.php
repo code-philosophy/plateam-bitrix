@@ -14,14 +14,22 @@ if (!Loader::includeModule($moduleId)) {
     return;
 }
 
-if ($REQUEST_METHOD === 'POST' && check_bitrix_sessid()) {
+/** @var array{TYPE:string,MESSAGE:string}|null $plateamAdminMessage */
+$plateamAdminMessage = null;
+
+$isPost = (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] === 'POST')
+    || (isset($REQUEST_METHOD) && $REQUEST_METHOD === 'POST');
+
+if ($isPost && check_bitrix_sessid()) {
     if (isset($_POST['test_api'])) {
+        $apiBase = trim((string) ($_POST['api_base'] ?? ''));
+        $apiKey = trim((string) ($_POST['api_key'] ?? ''));
         $client = new ApiClient(
-            $_POST['api_base'] ?: Config::apiBase(),
-            $_POST['api_key'] ?: Config::apiKey()
+            $apiBase !== '' ? $apiBase : Config::apiBase(),
+            $apiKey !== '' ? $apiKey : Config::apiKey()
         );
         $result = $client->partnersMe();
-        if ($result['ok']) {
+        if (!empty($result['ok'])) {
             $body = is_array($result['body'] ?? null) ? $result['body'] : [];
             $code = (string) ($body['code'] ?? 'partner');
             $keyEnv = trim((string) ($body['keyEnv'] ?? ''));
@@ -29,32 +37,49 @@ if ($REQUEST_METHOD === 'POST' && check_bitrix_sessid()) {
             if ($keyEnv !== '') {
                 $msg .= ' (keyEnv=' . $keyEnv . ')';
             }
-            CAdminMessage::ShowMessage([
-                'TYPE' => 'OK',
-                'MESSAGE' => $msg,
-            ]);
+            $plateamAdminMessage = ['TYPE' => 'OK', 'MESSAGE' => $msg];
         } else {
-            CAdminMessage::ShowMessage([
+            $detail = '';
+            if (!empty($result['error']) && is_string($result['error'])) {
+                $detail = $result['error'];
+            } elseif (is_string($result['raw'] ?? null) && $result['raw'] !== '') {
+                $detail = $result['raw'];
+            } elseif (is_array($result['body'] ?? null)) {
+                $detail = json_encode($result['body'], JSON_UNESCAPED_UNICODE);
+            }
+            if ($detail === '' || $detail === false) {
+                $detail = 'error';
+            }
+            if (strlen($detail) > 500) {
+                $detail = substr($detail, 0, 500) . '…';
+            }
+            $plateamAdminMessage = [
                 'TYPE' => 'ERROR',
-                'MESSAGE' => 'HTTP ' . $result['status'] . ': ' . ($result['raw'] ?? 'error'),
-            ]);
+                'MESSAGE' => 'HTTP ' . (int) ($result['status'] ?? 0) . ': ' . $detail,
+            ];
         }
-    } else {
-        Option::set($moduleId, 'partner_code', trim((string) $_POST['partner_code']));
-        Option::set($moduleId, 'api_key', trim((string) $_POST['api_key']));
-        Option::set($moduleId, 'platform_origin', rtrim(trim((string) $_POST['platform_origin']), '/'));
-        Option::set($moduleId, 'api_base', rtrim(trim((string) $_POST['api_base']), '/'));
-        Option::set($moduleId, 'go_origin', rtrim(trim((string) $_POST['go_origin']), '/'));
-        Option::set($moduleId, 'widget_version', trim((string) $_POST['widget_version']));
-        Option::set($moduleId, 'demo_ref_token', trim((string) $_POST['demo_ref_token']));
-        Option::set($moduleId, 'own_promo_code', strtoupper(trim((string) $_POST['own_promo_code'])));
-        Option::set($moduleId, 'foreign_promo_code', strtoupper(trim((string) $_POST['foreign_promo_code'])));
+    } elseif (isset($_POST['save']) || isset($_POST['Apply']) || isset($_POST['apply'])) {
+        Option::set($moduleId, 'partner_code', trim((string) ($_POST['partner_code'] ?? '')));
+        $postedKey = trim((string) ($_POST['api_key'] ?? ''));
+        if ($postedKey !== '') {
+            Option::set($moduleId, 'api_key', $postedKey);
+        }
+        Option::set($moduleId, 'platform_origin', rtrim(trim((string) ($_POST['platform_origin'] ?? '')), '/'));
+        Option::set($moduleId, 'api_base', rtrim(trim((string) ($_POST['api_base'] ?? '')), '/'));
+        Option::set($moduleId, 'go_origin', rtrim(trim((string) ($_POST['go_origin'] ?? '')), '/'));
+        Option::set($moduleId, 'widget_version', trim((string) ($_POST['widget_version'] ?? '')));
+        Option::set($moduleId, 'demo_ref_token', trim((string) ($_POST['demo_ref_token'] ?? '')));
+        Option::set($moduleId, 'own_promo_code', strtoupper(trim((string) ($_POST['own_promo_code'] ?? ''))));
+        Option::set($moduleId, 'foreign_promo_code', strtoupper(trim((string) ($_POST['foreign_promo_code'] ?? ''))));
         Option::set(
             $moduleId,
             'block_foreign_with_referral',
             !empty($_POST['block_foreign_with_referral']) ? 'Y' : 'N'
         );
-        CAdminMessage::ShowMessage(['TYPE' => 'OK', 'MESSAGE' => Loc::getMessage('PLATEAM_PARTNER_OPTIONS_TITLE') . ': saved']);
+        $plateamAdminMessage = [
+            'TYPE' => 'OK',
+            'MESSAGE' => Loc::getMessage('PLATEAM_PARTNER_OPTIONS_TITLE') . ': saved',
+        ];
     }
 }
 
@@ -69,8 +94,16 @@ $ownPromo = Option::get($moduleId, 'own_promo_code', '');
 $foreignPromo = Option::get($moduleId, 'foreign_promo_code', '');
 $blockForeign = Option::get($moduleId, 'block_foreign_with_referral', 'Y') !== 'N';
 
+if (is_array($plateamAdminMessage)) {
+    CAdminMessage::ShowMessage($plateamAdminMessage);
+}
+
 $tabControl = new CAdminTabControl('tabControl', [
-    ['DIV' => 'edit1', 'TAB' => Loc::getMessage('PLATEAM_PARTNER_OPTIONS_TITLE'), 'TITLE' => Loc::getMessage('PLATEAM_PARTNER_OPTIONS_TITLE')],
+    [
+        'DIV' => 'edit1',
+        'TAB' => Loc::getMessage('PLATEAM_PARTNER_OPTIONS_TITLE'),
+        'TITLE' => Loc::getMessage('PLATEAM_PARTNER_OPTIONS_TITLE'),
+    ],
 ]);
 ?>
 <form method="post" action="<?= $APPLICATION->GetCurPage() ?>?mid=<?= urlencode($moduleId) ?>&lang=<?= LANGUAGE_ID ?>">
