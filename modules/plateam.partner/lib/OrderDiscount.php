@@ -5,6 +5,12 @@ namespace Plateam\Partner;
 class OrderDiscount
 {
     public const CERT_PAYMENT_XML_ID = 'PLATEAM_CERT';
+
+    /** Preferred stub handler from devtools (optional on partner shops). */
+    public const PREFERRED_HANDLER = 'plateam_stub';
+
+    public const FALLBACK_PAY_SYSTEM_NAME = 'PLATEAM';
+
     /**
      * Корректирует сумму платежа под cashKop.
      * Не трогаем DISCOUNT_PRICE / doFinalAction — ломает AJAX-расчёт checkout Bitrix.
@@ -49,8 +55,8 @@ class OrderDiscount
             return;
         }
 
-        $paySystemId = self::defaultPaySystemId((int) $order->getPersonTypeId());
-        if ($paySystemId <= 0) {
+        $paySystem = self::resolvePaySystem((int) $order->getPersonTypeId());
+        if ($paySystem['id'] <= 0) {
             return;
         }
 
@@ -58,33 +64,83 @@ class OrderDiscount
         $payment->setFields([
             'SUM' => $cashRub,
             'CURRENCY' => $order->getCurrency(),
-            'PAY_SYSTEM_ID' => $paySystemId,
-            'PAY_SYSTEM_NAME' => PaySystemInstaller::PAY_SYSTEM_NAME,
+            'PAY_SYSTEM_ID' => $paySystem['id'],
+            'PAY_SYSTEM_NAME' => $paySystem['name'],
         ]);
     }
 
     public static function defaultPaySystemId(int $personTypeId): int
     {
+        return self::resolvePaySystem($personTypeId)['id'];
+    }
+
+    /**
+     * Prefer optional plateam_stub (devtools), otherwise any active pay system.
+     * Does not depend on PaySystemInstaller (devtools-only).
+     *
+     * @return array{id:int,name:string}
+     */
+    private static function resolvePaySystem(int $personTypeId): array
+    {
+        $empty = ['id' => 0, 'name' => self::FALLBACK_PAY_SYSTEM_NAME];
         if (!class_exists(\Bitrix\Sale\PaySystem\Manager::class)) {
-            return 0;
+            return $empty;
         }
-        $filter = ['ACTIVE' => 'Y', 'ACTION_FILE' => PaySystemInstaller::HANDLER_CODE];
+
+        $handler = self::PREFERRED_HANDLER;
+        if (class_exists(PaySystemInstaller::class)) {
+            $handler = PaySystemInstaller::HANDLER_CODE;
+        }
+
+        $row = self::fetchPaySystemRow([
+            'ACTIVE' => 'Y',
+            'ACTION_FILE' => $handler,
+        ], $personTypeId);
+        if (!$row) {
+            $row = self::fetchPaySystemRow([
+                'ACTIVE' => 'Y',
+                'ACTION_FILE' => $handler,
+            ], 0);
+        }
+        if (!$row) {
+            $row = self::fetchPaySystemRow(['ACTIVE' => 'Y'], $personTypeId);
+        }
+        if (!$row) {
+            $row = self::fetchPaySystemRow(['ACTIVE' => 'Y'], 0);
+        }
+        if (!$row) {
+            return $empty;
+        }
+
+        $name = trim((string) ($row['NAME'] ?? ''));
+        if ($name === '' && class_exists(PaySystemInstaller::class)) {
+            $name = PaySystemInstaller::PAY_SYSTEM_NAME;
+        }
+        if ($name === '') {
+            $name = self::FALLBACK_PAY_SYSTEM_NAME;
+        }
+
+        return [
+            'id' => (int) $row['ID'],
+            'name' => $name,
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $filter
+     * @return array<string, mixed>|null
+     */
+    private static function fetchPaySystemRow(array $filter, int $personTypeId): ?array
+    {
         if ($personTypeId > 0) {
             $filter['PERSON_TYPE_ID'] = $personTypeId;
         }
         $row = \Bitrix\Sale\PaySystem\Manager::getList([
             'filter' => $filter,
-            'select' => ['ID'],
+            'select' => ['ID', 'NAME'],
             'limit' => 1,
         ])->fetch();
-        if ($row) {
-            return (int) $row['ID'];
-        }
-        $row = \Bitrix\Sale\PaySystem\Manager::getList([
-            'filter' => ['ACTIVE' => 'Y', 'ACTION_FILE' => PaySystemInstaller::HANDLER_CODE],
-            'select' => ['ID'],
-            'limit' => 1,
-        ])->fetch();
-        return $row ? (int) $row['ID'] : 0;
+
+        return is_array($row) ? $row : null;
     }
 }

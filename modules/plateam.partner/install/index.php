@@ -29,8 +29,8 @@ class plateam_partner extends CModule
     public function DoInstall()
     {
         global $APPLICATION;
-        if (!CheckVersion(ModuleManager::getVersion('main'), '20.0.0')) {
-            $APPLICATION->ThrowException(Loc::getMessage('PLATEAM_PARTNER_ERR_MAIN') ?: 'Requires main >= 20.0.0');
+        if (!CheckVersion(ModuleManager::getVersion('main'), '18.0.0')) {
+            $APPLICATION->ThrowException(Loc::getMessage('PLATEAM_PARTNER_ERR_MAIN') ?: 'Requires main >= 18.0.0');
             return false;
         }
         if (!ModuleManager::isModuleInstalled('sale')) {

@@ -70,7 +70,7 @@ class SessionBridge
     public static function resolvedHoldId(array $props): string
     {
         $holdId = trim((string) ($props['holdId'] ?? ''));
-        if ($holdId === '' || str_starts_with($holdId, 'E:')) {
+        if ($holdId === '' || self::startsWith($holdId, 'E:')) {
             return '';
         }
         return $holdId;
@@ -88,6 +88,7 @@ class SessionBridge
     public static function flagResetPickCookie(): void
     {
         $secure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+        // Array options require PHP 7.3+ (module targets 7.4+).
         setcookie(self::RESET_PICK_COOKIE, '1', [
             'expires' => time() + 86400,
             'path' => '/',
@@ -119,7 +120,7 @@ class SessionBridge
         $out = [];
         $collection = $order->getPropertyCollection();
         foreach (self::PROP_CODES as $key => $code) {
-            $prop = $collection->getItemByOrderPropertyCode($code);
+            $prop = self::findOrderProp($collection, $code);
             if ($prop) {
                 $out[$key] = (string) $prop->getValue();
             }
@@ -130,10 +131,47 @@ class SessionBridge
     public static function writeOrderProp(\Bitrix\Sale\Order $order, string $code, string $value): void
     {
         $collection = $order->getPropertyCollection();
-        $prop = $collection->getItemByOrderPropertyCode($code);
+        $prop = self::findOrderProp($collection, $code);
         if ($prop) {
             $prop->setValue($value);
         }
+    }
+
+    /**
+     * Sale 20+: getItemByOrderPropertyCode.
+     * Sale 18.x: only getItemByOrderPropertyId — resolve by CODE via iteration.
+     *
+     * @param \Bitrix\Sale\PropertyValueCollection|\Bitrix\Sale\PropertyValueCollectionBase $collection
+     * @return \Bitrix\Sale\PropertyValue|\Bitrix\Sale\PropertyValueBase|null
+     */
+    private static function findOrderProp($collection, string $code)
+    {
+        if (method_exists($collection, 'getItemByOrderPropertyCode')) {
+            $prop = $collection->getItemByOrderPropertyCode($code);
+            if ($prop) {
+                return $prop;
+            }
+        }
+
+        foreach ($collection as $prop) {
+            $propertyCode = '';
+            if (method_exists($prop, 'getProperty')) {
+                $property = $prop->getProperty();
+                if (is_array($property)) {
+                    $propertyCode = (string) ($property['CODE'] ?? '');
+                } elseif (is_object($property) && method_exists($property, 'getField')) {
+                    $propertyCode = (string) $property->getField('CODE');
+                }
+            }
+            if ($propertyCode === '' && method_exists($prop, 'getField')) {
+                $propertyCode = (string) $prop->getField('CODE');
+            }
+            if ($propertyCode === $code) {
+                return $prop;
+            }
+        }
+
+        return null;
     }
 
     public static function orderIdForApi(\Bitrix\Sale\Order $order): string
@@ -150,7 +188,10 @@ class SessionBridge
         return (int) round((float) $price * 100);
     }
 
-    public static function truthy(mixed $value): bool
+    /**
+     * @param mixed $value
+     */
+    public static function truthy($value): bool
     {
         if (is_bool($value)) {
             return $value;
@@ -160,5 +201,14 @@ class SessionBridge
         }
         $s = strtolower(trim((string) $value));
         return in_array($s, ['1', 'true', 'y', 'yes', 'on'], true);
+    }
+
+    /** PHP 7.4 polyfill for str_starts_with (PHP 8+). */
+    private static function startsWith(string $haystack, string $needle): bool
+    {
+        if ($needle === '') {
+            return true;
+        }
+        return strpos($haystack, $needle) === 0;
     }
 }

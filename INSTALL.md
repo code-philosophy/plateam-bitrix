@@ -6,7 +6,8 @@
 
 ## Требования
 
-- 1С-Битрикс с модулем **sale**
+- PHP **7.4+**
+- 1С-Битрикс **main ≥ 18.0.0** с модулем **sale**
 - HTTPS на витрине
 - От кабинета ПЛАТИМ (`https://pla.team`): `partner_code`, API key (`pk_test_` или `pk_live_`); origin сайта в whitelist Системы
 

@@ -8,9 +8,10 @@
 
 | | |
 | --- | --- |
-| Версия | **1.1.0** |
+| Версия | **1.1.1** |
 | MODULE_ID | `plateam.partner` |
-| Репозиторий | private (Маркетплейс — загрузка пакета, см. [MARKETPLACE.md](MARKETPLACE.md)) |
+| Совместимость | PHP **7.4+**, Bitrix **main ≥ 18.0.0**, модуль **sale** |
+| Репозиторий | [code-philosophy/plateam-bitrix](https://github.com/code-philosophy/plateam-bitrix) |
 
 ## Быстрый старт
 

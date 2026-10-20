@@ -44,6 +44,15 @@ class OptionsMigrator
     /** Sandbox/live keys from partner cabinet on pla.team. */
     private static function isModernPartnerKey(string $key): bool
     {
-        return str_starts_with($key, 'pk_test_') || str_starts_with($key, 'pk_live_');
+        return self::startsWith($key, 'pk_test_') || self::startsWith($key, 'pk_live_');
+    }
+
+    /** PHP 7.4 polyfill for str_starts_with (PHP 8+). */
+    private static function startsWith(string $haystack, string $needle): bool
+    {
+        if ($needle === '') {
+            return true;
+        }
+        return strpos($haystack, $needle) === 0;
     }
 }
