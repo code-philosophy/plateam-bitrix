@@ -975,24 +975,31 @@
     function stashBeacon(session) {
       if (!stashUrl || !session) return;
       var payload = stashPayload(session);
-      var params = new URLSearchParams();
-      Object.keys(payload).forEach(function (key) {
-        params.append(key, String(payload[key]));
-      });
-      if (navigator.sendBeacon) {
-        navigator.sendBeacon(stashUrl, params);
-        return;
-      }
       fetch(stashUrl, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
+          'Content-Type': 'application/json',
           'X-Bitrix-Csrf-Token': bitrixSessid(),
         },
         credentials: 'same-origin',
-        body: params.toString(),
+        body: JSON.stringify(payload),
         keepalive: true,
       }).catch(function () {});
+    }
+
+    function sessionForStash() {
+      if (sessionRef) return sessionRef;
+      try {
+        if (window.PLATEAM && typeof window.PLATEAM.getSession === 'function') {
+          return window.PLATEAM.getSession();
+        }
+      } catch (e) {}
+      return null;
+    }
+
+    function maybeStashSession(session) {
+      if (!session || !session.visitorId || summaryOnly) return;
+      stash(session);
     }
 
     function isCartToOrderClick(target) {
@@ -1108,24 +1115,29 @@
 
     if (window.PLATEAM && typeof window.PLATEAM.onSession === 'function') {
       window.PLATEAM.onSession(function (s) {
+        sessionRef = s;
         render(s);
+        maybeStashSession(s);
       });
     }
 
     waitSession(15000, function (session) {
       captureBaseFromDomIfNeeded();
-      render(session);
-      if (session && session.visitorId && !summaryOnly) {
-        stash(session);
+      if (session) {
+        sessionRef = session;
       }
+      render(session);
+      maybeStashSession(session);
     });
 
     document.addEventListener(
       'click',
       function (ev) {
-        if (!sessionRef) return;
         if (isCheckoutPayClick(ev.target) || isCartToOrderClick(ev.target)) {
-          stashBeacon(sessionRef);
+          var s = sessionForStash();
+          if (s) {
+            stashBeacon(s);
+          }
         }
       },
       true,

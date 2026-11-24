@@ -200,4 +200,4 @@ $tabControl = new CAdminTabControl('tabControl', [
     });
 })();
 </script>
-<p style="margin-top:8px;color:#888;font-size:11px;">plateam.partner options build 1.1.5</p>
+<p style="margin-top:8px;color:#888;font-size:11px;">plateam.partner options build 1.1.6</p>

@@ -14,5 +14,6 @@ if (!Loader::includeModule('plateam.partner')) {
 $arResult['PARTNER_CODE'] = Config::partnerCode();
 $arResult['PLATFORM_ORIGIN'] = Config::platformOrigin();
 $arResult['WIDGET_VERSION'] = Config::widgetVersion();
+$arResult['STASH_URL'] = '/local/modules/plateam.partner/tools/stash_checkout.php';
 
 $this->includeComponentTemplate();

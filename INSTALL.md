@@ -59,10 +59,19 @@ modules/plateam.partner  →  /local/modules/plateam.partner
 <?php $APPLICATION->IncludeComponent('plateam:widget', '', [], false); ?>
 ```
 
-На странице корзины:
+На странице корзины, которой реально пользуются покупатели (проверьте
+`PATH_TO_BASKET` в `sale.order.ajax` — часто `/personal/cart/` и `/cart/` это
+разные URL; компонент `plateam:checkout` нужен на **той**, где оформляют заказ):
 
 ```php
 <?php $APPLICATION->IncludeComponent('plateam:checkout', '', [], false); ?>
+```
+
+На странице оформления заказа (`sale.order.ajax`), чтобы данные PLATEAM не
+терялись при переходе с корзины:
+
+```php
+<?php $APPLICATION->IncludeComponent('plateam:checkout', '', ['MODE' => 'summary'], false); ?>
 ```
 
 Виджет грузится с `{platform_origin}/widget.js`. В сессии виджета **нет** API key — только публичные поля и короткоживущий `checkoutToken` для серверного `POST /holds`.
