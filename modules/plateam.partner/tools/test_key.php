@@ -27,13 +27,12 @@ ToolsAuth::requireAdmin();
 ToolsAuth::requireSessid();
 
 $apiBase = trim((string) ($_REQUEST['api_base'] ?? ''));
-$apiKey = trim((string) ($_REQUEST['api_key'] ?? ''));
+$formKey = trim((string) ($_REQUEST['api_key'] ?? ''));
+$savedKey = trim(Config::apiKey());
 if ($apiBase === '') {
     $apiBase = Config::apiBase();
 }
-if ($apiKey === '') {
-    $apiKey = Config::apiKey();
-}
+$apiKey = $formKey !== '' ? $formKey : $savedKey;
 
 if ($apiKey === '') {
     echo json_encode([
@@ -46,6 +45,18 @@ if ($apiKey === '') {
 
 $client = new ApiClient($apiBase, $apiKey);
 $result = $client->partnersMe();
+$usedSavedAfterForm401 = false;
+
+if (
+    empty($result['ok'])
+    && (int) ($result['status'] ?? 0) === 401
+    && $formKey !== ''
+    && $savedKey !== ''
+    && !hash_equals($formKey, $savedKey)
+) {
+    $result = (new ApiClient($apiBase, $savedKey))->partnersMe();
+    $usedSavedAfterForm401 = !empty($result['ok']);
+}
 
 if (!empty($result['ok'])) {
     $body = is_array($result['body'] ?? null) ? $result['body'] : [];
@@ -55,12 +66,16 @@ if (!empty($result['ok'])) {
     if ($keyEnv !== '') {
         $msg .= ' (keyEnv=' . $keyEnv . ')';
     }
+    if ($usedSavedAfterForm401) {
+        $msg .= '. Поле API key не совпало с сохранённым (часто автозаполнение). Очистите поле или вставьте ключ из кабинета pla.team заново.';
+    }
     echo json_encode([
         'ok' => true,
         'message' => $msg,
         'code' => $code,
         'keyEnv' => $keyEnv,
         'body' => $body,
+        'usedSavedKey' => $usedSavedAfterForm401,
     ], JSON_UNESCAPED_UNICODE);
     die();
 }

@@ -102,7 +102,7 @@ $tabControl = new CAdminTabControl('tabControl', [
     </tr>
     <tr>
         <td><?= Loc::getMessage('PLATEAM_PARTNER_OPT_API_KEY') ?>:</td>
-        <td><input type="password" name="api_key" id="plateam_api_key" value="<?= htmlspecialcharsbx($apiKey) ?>" size="60" autocomplete="off"></td>
+        <td><input type="password" name="api_key" id="plateam_api_key" value="<?= htmlspecialcharsbx($apiKey) ?>" size="60" autocomplete="new-password" data-lpignore="true" data-1p-ignore="true"></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('PLATEAM_PARTNER_OPT_PLATFORM') ?>:</td>
@@ -158,12 +158,27 @@ $tabControl = new CAdminTabControl('tabControl', [
         try { box.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch (e) {}
     }
 
+    var keyEl = document.getElementById('plateam_api_key');
+    var keyDirty = false;
+    if (keyEl) {
+        keyEl.addEventListener('input', function () { keyDirty = true; });
+        keyEl.addEventListener('change', function () { keyDirty = true; });
+    }
+
     btn.addEventListener('click', function () {
         show(true, '…');
         var body = new FormData();
         body.append('sessid', <?= \Bitrix\Main\Web\Json::encode($sessId) ?>);
         body.append('api_base', (document.getElementById('plateam_api_base') || {}).value || '');
-        body.append('api_key', (document.getElementById('plateam_api_key') || {}).value || '');
+        if (keyDirty && keyEl) {
+            var keyVal = keyEl.value || '';
+            if (keyVal !== '' && !/^pk_(test|live)_/i.test(keyVal)) {
+                keyVal = '';
+            }
+            if (keyVal !== '') {
+                body.append('api_key', keyVal);
+            }
+        }
 
         fetch(<?= \Bitrix\Main\Web\Json::encode($testUrl) ?>, {
             method: 'POST',
@@ -185,4 +200,4 @@ $tabControl = new CAdminTabControl('tabControl', [
     });
 })();
 </script>
-<p style="margin-top:8px;color:#888;font-size:11px;">plateam.partner options build 1.1.4</p>
+<p style="margin-top:8px;color:#888;font-size:11px;">plateam.partner options build 1.1.5</p>
