@@ -47,6 +47,9 @@ class EventHandlers
             if ($isNew) {
                 SessionBridge::clearCheckout();
                 SessionBridge::flagResetPickCookie();
+                // Reserve certificates early (partial cash + certs), not only at paid sync.
+                $props = SessionBridge::readOrderProps($order);
+                self::ensureHold($order, $props);
             }
             self::coverCertificateRemainder($order);
             self::maybeAutoPayZeroCash($order);
@@ -268,12 +271,23 @@ class EventHandlers
                 $cashKop = (int) $props['cashKop'];
             }
 
+            $holdId = SessionBridge::resolvedHoldId($props);
+            if ($certTotal > 0 && $holdId === '') {
+                $holdDiag = trim((string) ($props['holdId'] ?? ''));
+                $err = $holdDiag !== '' && self::startsWith($holdDiag, 'E:')
+                    ? substr($holdDiag, 2)
+                    : 'no_hold';
+                SessionBridge::writeOrderProp($order, SessionBridge::PROP_CODES['paidSent'], 'E:' . substr($err, 0, 40));
+                $order->save();
+                return;
+            }
+
             $result = (new OrderSync())->markPaid([
                 'orderId' => $apiOrderId,
                 'visitorId' => $visitorId !== '' ? $visitorId : null,
                 'userId' => $userId !== '' ? $userId : null,
                 'cashKop' => $cashKop,
-                'holdId' => SessionBridge::resolvedHoldId($props) ?: null,
+                'holdId' => $holdId !== '' ? $holdId : null,
             ]);
 
             if ($result['ok']) {
@@ -298,6 +312,14 @@ class EventHandlers
     }
 
     /** @param array<string, mixed> $result */
+    private static function startsWith(string $haystack, string $prefix): bool
+    {
+        if ($prefix === '') {
+            return true;
+        }
+        return strncmp($haystack, $prefix, strlen($prefix)) === 0;
+    }
+
     private static function formatApiError(array $result): string
     {
         if (!empty($result['error']) && is_string($result['error'])) {

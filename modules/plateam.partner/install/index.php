@@ -74,11 +74,75 @@ class plateam_partner extends CModule
 
     public function InstallEvents()
     {
+        $em = \Bitrix\Main\EventManager::getInstance();
+        $saleHandlers = [
+            ['OnSaleOrderBeforeSaved', 'onOrderBeforeSaved'],
+            ['OnSaleOrderSaved', 'onOrderSaved'],
+            ['OnSalePaymentEntitySaved', 'onPaymentSaved'],
+            ['OnSaleOrderPaid', 'onOrderPaid'],
+            ['OnSaleOrderCanceled', 'onOrderCanceled'],
+        ];
+        foreach ($saleHandlers as [$event, $method]) {
+            $em->registerEventHandler(
+                'sale',
+                $event,
+                $this->MODULE_ID,
+                '\\Plateam\\Partner\\EventHandlers',
+                $method
+            );
+        }
+        $em->registerEventHandler(
+            'main',
+            'OnProlog',
+            $this->MODULE_ID,
+            '\\Plateam\\Partner\\PromoBridge',
+            'onProlog'
+        );
+        $em->registerEventHandler(
+            'sale',
+            'OnSaleDiscountCouponApplyed',
+            $this->MODULE_ID,
+            '\\Plateam\\Partner\\PromoBridge',
+            'onCouponApplied'
+        );
+
         return true;
     }
 
     public function UnInstallEvents()
     {
+        $em = \Bitrix\Main\EventManager::getInstance();
+        $saleHandlers = [
+            ['OnSaleOrderBeforeSaved', 'onOrderBeforeSaved'],
+            ['OnSaleOrderSaved', 'onOrderSaved'],
+            ['OnSalePaymentEntitySaved', 'onPaymentSaved'],
+            ['OnSaleOrderPaid', 'onOrderPaid'],
+            ['OnSaleOrderCanceled', 'onOrderCanceled'],
+        ];
+        foreach ($saleHandlers as [$event, $method]) {
+            $em->unRegisterEventHandler(
+                'sale',
+                $event,
+                $this->MODULE_ID,
+                '\\Plateam\\Partner\\EventHandlers',
+                $method
+            );
+        }
+        $em->unRegisterEventHandler(
+            'main',
+            'OnProlog',
+            $this->MODULE_ID,
+            '\\Plateam\\Partner\\PromoBridge',
+            'onProlog'
+        );
+        $em->unRegisterEventHandler(
+            'sale',
+            'OnSaleDiscountCouponApplyed',
+            $this->MODULE_ID,
+            '\\Plateam\\Partner\\PromoBridge',
+            'onCouponApplied'
+        );
+
         return true;
     }
 

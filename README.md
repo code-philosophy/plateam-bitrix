@@ -8,7 +8,7 @@
 
 | | |
 | --- | --- |
-| Версия | **1.1.6** |
+| Версия | **1.1.8** |
 | MODULE_ID | `plateam.partner` |
 | Совместимость | PHP **7.4+**, Bitrix **main ≥ 18.0.0**, модуль **sale** |
 | Репозиторий | [code-philosophy/plateam-bitrix](https://github.com/code-philosophy/plateam-bitrix) |
@@ -34,6 +34,7 @@ modules/plateam.partner/     ← пакет для Маркетплейса / р
 INSTALL.md
 MARKETPLACE.md
 devtools/                    ← внутренняя отладка команды (не в zip, не партнёрский онбординг)
+  plateam.php                ← список заказов с полями PLATEAM (в корень сайта на dev)
 scripts/pack-marketplace.sh
 ```
 
