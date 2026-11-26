@@ -43,5 +43,5 @@ Paid/cancelled по-прежнему с сервера ИМ; виджетный 
 
 ## Виджет
 
-`<script src="{platform_origin}/widget.js">` — файл на платформе ПЛАТИМ.  
+`<script src="https://pla.team/widget.js">` — файл на платформе ПЛАТИМ.  
 В сессии нет `apiKey`; для серверного hold нужен `checkoutToken`.

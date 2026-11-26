@@ -4,8 +4,8 @@
  * Internal team bootstrap only (east / lab).
  * Copy this file to the site if needed — it is NOT part of the marketplace module package.
  *
- * Defaults target production pla.team (partner onboarding contour).
- * Set PLATEAM_DEVTOOLS_DEMO=1 to seed internal *.demo.pla.team (team sandbox, not partner LK).
+ * Hosts are fixed in Config (pla.team / go.pla.team).
+ * Set PLATEAM_DEVTOOLS_DEMO=1 to seed the legacy sandbox API key (team only, not partner LK).
  */
 
 define('NO_KEEP_STATISTIC', true);
@@ -59,29 +59,15 @@ if (Loader::includeModule('sale')) {
     }
 }
 
+$defaults = [
+    'partner_code' => 'north',
+    'demo_ref_token' => 'demo-ref-north',
+    'own_promo_code' => 'PLATEAM',
+    'foreign_promo_code' => 'SHOP10',
+    'widget_version' => '1.1.0',
+];
 if ($useDemoHost) {
-    $defaults = [
-        'partner_code' => 'north',
-        'platform_origin' => 'https://app.demo.pla.team',
-        'api_base' => 'https://app.demo.pla.team/api/v0',
-        'go_origin' => 'https://go.demo.pla.team',
-        'demo_ref_token' => 'demo-ref-north',
-        'own_promo_code' => 'PLATEAM',
-        'foreign_promo_code' => 'SHOP10',
-        'widget_version' => '1.1.0',
-    ];
-    $steps[] = 'WARNING: internal demo host (not partner onboarding)';
-} else {
-    $defaults = [
-        'partner_code' => 'north',
-        'platform_origin' => 'https://pla.team',
-        'api_base' => 'https://pla.team/api/v0',
-        'go_origin' => 'https://go.pla.team',
-        'demo_ref_token' => 'demo-ref-north',
-        'own_promo_code' => 'PLATEAM',
-        'foreign_promo_code' => 'SHOP10',
-        'widget_version' => '1.1.0',
-    ];
+    $steps[] = 'WARNING: seeding legacy sandbox key only; hosts stay on pla.team';
 }
 
 foreach ($defaults as $key => $value) {

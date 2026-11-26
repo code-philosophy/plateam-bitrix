@@ -26,12 +26,9 @@ if (!Loader::includeModule('plateam.partner')) {
 ToolsAuth::requireAdmin();
 ToolsAuth::requireSessid();
 
-$apiBase = trim((string) ($_REQUEST['api_base'] ?? ''));
+$apiBase = Config::apiBase();
 $formKey = trim((string) ($_REQUEST['api_key'] ?? ''));
 $savedKey = trim(Config::apiKey());
-if ($apiBase === '') {
-    $apiBase = Config::apiBase();
-}
 $apiKey = $formKey !== '' ? $formKey : $savedKey;
 
 if ($apiKey === '') {

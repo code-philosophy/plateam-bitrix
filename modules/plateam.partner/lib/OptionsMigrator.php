@@ -15,15 +15,9 @@ class OptionsMigrator
     {
         $moduleId = Config::MODULE_ID;
 
-        $platform = trim((string) Option::get($moduleId, 'platform_origin', ''));
-        $apiBase = trim((string) Option::get($moduleId, 'api_base', ''));
-        $goOrigin = trim((string) Option::get($moduleId, 'go_origin', ''));
-
-        if (self::isDemoHost($platform) || self::isDemoHost($apiBase) || self::isDemoHost($goOrigin)) {
-            Option::set($moduleId, 'platform_origin', 'https://pla.team');
-            Option::set($moduleId, 'api_base', 'https://pla.team/api/v0');
-            Option::set($moduleId, 'go_origin', 'https://go.pla.team');
-        }
+        Option::set($moduleId, 'platform_origin', Config::PLATFORM_ORIGIN);
+        Option::set($moduleId, 'api_base', Config::API_BASE);
+        Option::set($moduleId, 'go_origin', Config::GO_ORIGIN);
 
         $apiKey = trim((string) Option::get($moduleId, 'api_key', ''));
         if ($apiKey !== '' && !self::isModernPartnerKey($apiKey)) {
@@ -31,14 +25,6 @@ class OptionsMigrator
         }
 
         Option::set($moduleId, self::MARKER, 'Y');
-    }
-
-    private static function isDemoHost(string $value): bool
-    {
-        if ($value === '') {
-            return false;
-        }
-        return stripos($value, 'demo.pla.team') !== false;
     }
 
     /** Sandbox/live keys from partner cabinet on pla.team. */

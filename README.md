@@ -8,7 +8,7 @@
 
 | | |
 | --- | --- |
-| Версия | **1.1.8** |
+| Версия | **1.1.9** |
 | MODULE_ID | `plateam.partner` |
 | Совместимость | PHP **7.4+**, Bitrix **main ≥ 18.0.0**, модуль **sale** |
 | Репозиторий | [code-philosophy/plateam-bitrix](https://github.com/code-philosophy/plateam-bitrix) |
@@ -19,7 +19,7 @@
    (или установить zip из `scripts/pack-marketplace.sh`)
 2. Админка → **Marketplace → Установленные решения** → **PLATEAM Partner** → Установить  
    (компоненты копируются в `/local/components/plateam` автоматически)
-3. **Настройки модулей → PLATEAM Partner:** код партнёра, API key (`pk_test_` / `pk_live_`), origin `https://pla.team`
+3. **Настройки модулей → PLATEAM Partner:** код партнёра и API key (`pk_test_` / `pk_live_`). Виджет и API всегда на `https://pla.team`
 4. В шаблон: `plateam:widget`; в корзину: `plateam:checkout`
 5. Кнопка **Проверить ключ** (смотрите `keyEnv`)
 
@@ -38,7 +38,7 @@ devtools/                    ← внутренняя отладка коман�
 scripts/pack-marketplace.sh
 ```
 
-Виджет (`widget.js`) хостится на платформе: `{platform_origin}/widget.js`.
+Виджет (`widget.js`) хостится на платформе: `https://pla.team/widget.js`.
 
 ## Credentials
 

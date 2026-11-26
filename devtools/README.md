@@ -8,7 +8,7 @@
 
 | Путь | Назначение |
 | --- | --- |
-| `tools/web_install.php` | Bootstrap модуля для внутреннего стенда (по умолчанию `pla.team`; demo host — только явный override) |
+| `tools/web_install.php` | Bootstrap модуля для внутреннего стенда (хосты всегда `pla.team`; `PLATEAM_DEVTOOLS_DEMO=1` только сидирует sandbox-ключ) |
 | `tools/setup_demo_*` | Каталог и промокоды стенда |
 | `tools/debug_*`, `test_*` | Отладка |
 | `sale_payment/plateam_stub` | Тестовая платёжка |

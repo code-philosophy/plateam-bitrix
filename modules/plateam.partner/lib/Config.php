@@ -8,6 +8,11 @@ class Config
 {
     public const MODULE_ID = 'plateam.partner';
 
+    /** Боевые origin. В настройках модуля не меняются. */
+    public const PLATFORM_ORIGIN = 'https://pla.team';
+    public const API_BASE = 'https://pla.team/api/v0';
+    public const GO_ORIGIN = 'https://go.pla.team';
+
     public static function partnerCode(): string
     {
         return trim((string) Option::get(self::MODULE_ID, 'partner_code', ''));
@@ -20,17 +25,12 @@ class Config
 
     public static function platformOrigin(): string
     {
-        $v = trim((string) Option::get(self::MODULE_ID, 'platform_origin', 'https://pla.team'));
-        return rtrim($v !== '' ? $v : 'https://pla.team', '/');
+        return self::PLATFORM_ORIGIN;
     }
 
     public static function apiBase(): string
     {
-        $v = trim((string) Option::get(self::MODULE_ID, 'api_base', ''));
-        if ($v !== '') {
-            return rtrim($v, '/');
-        }
-        return self::platformOrigin() . '/api/v0';
+        return self::API_BASE;
     }
 
     public static function widgetVersion(): string
@@ -75,8 +75,7 @@ class Config
 
     public static function goOrigin(): string
     {
-        $v = trim((string) Option::get(self::MODULE_ID, 'go_origin', 'https://go.pla.team'));
-        return rtrim($v !== '' ? $v : 'https://go.pla.team', '/');
+        return self::GO_ORIGIN;
     }
 
     public static function goReferralUrl(): string

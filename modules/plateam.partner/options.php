@@ -3,7 +3,6 @@
 use Bitrix\Main\Config\Option;
 use Bitrix\Main\Loader;
 use Bitrix\Main\Localization\Loc;
-use Plateam\Partner\Config;
 
 $moduleId = 'plateam.partner';
 Loc::loadMessages(__FILE__);
@@ -30,9 +29,6 @@ if ($isPost && check_bitrix_sessid() && (isset($_POST['save']) || isset($_POST['
     if ($postedKey !== '') {
         Option::set($moduleId, 'api_key', $postedKey);
     }
-    Option::set($moduleId, 'platform_origin', rtrim(trim((string) ($_POST['platform_origin'] ?? '')), '/'));
-    Option::set($moduleId, 'api_base', rtrim(trim((string) ($_POST['api_base'] ?? '')), '/'));
-    Option::set($moduleId, 'go_origin', rtrim(trim((string) ($_POST['go_origin'] ?? '')), '/'));
     Option::set($moduleId, 'widget_version', trim((string) ($_POST['widget_version'] ?? '')));
     Option::set($moduleId, 'demo_ref_token', trim((string) ($_POST['demo_ref_token'] ?? '')));
     Option::set($moduleId, 'own_promo_code', strtoupper(trim((string) ($_POST['own_promo_code'] ?? ''))));
@@ -62,9 +58,6 @@ if ($isPost && check_bitrix_sessid() && (isset($_POST['save']) || isset($_POST['
 
 $partnerCode = Option::get($moduleId, 'partner_code', '');
 $apiKey = Option::get($moduleId, 'api_key', '');
-$platformOrigin = Option::get($moduleId, 'platform_origin', 'https://pla.team');
-$apiBase = Option::get($moduleId, 'api_base', 'https://pla.team/api/v0');
-$goOrigin = Option::get($moduleId, 'go_origin', 'https://go.pla.team');
 $widgetVersion = Option::get($moduleId, 'widget_version', '1.0.0');
 $refToken = Option::get($moduleId, 'demo_ref_token', '');
 $ownPromo = Option::get($moduleId, 'own_promo_code', '');
@@ -103,18 +96,6 @@ $tabControl = new CAdminTabControl('tabControl', [
     <tr>
         <td><?= Loc::getMessage('PLATEAM_PARTNER_OPT_API_KEY') ?>:</td>
         <td><input type="password" name="api_key" id="plateam_api_key" value="<?= htmlspecialcharsbx($apiKey) ?>" size="60" autocomplete="new-password" data-lpignore="true" data-1p-ignore="true"></td>
-    </tr>
-    <tr>
-        <td><?= Loc::getMessage('PLATEAM_PARTNER_OPT_PLATFORM') ?>:</td>
-        <td><input type="text" name="platform_origin" id="plateam_platform_origin" value="<?= htmlspecialcharsbx($platformOrigin) ?>" size="60"></td>
-    </tr>
-    <tr>
-        <td><?= Loc::getMessage('PLATEAM_PARTNER_OPT_API_BASE') ?>:</td>
-        <td><input type="text" name="api_base" id="plateam_api_base" value="<?= htmlspecialcharsbx($apiBase) ?>" size="60"></td>
-    </tr>
-    <tr>
-        <td><?= Loc::getMessage('PLATEAM_PARTNER_OPT_GO_ORIGIN') ?>:</td>
-        <td><input type="text" name="go_origin" value="<?= htmlspecialcharsbx($goOrigin) ?>" size="60"></td>
     </tr>
     <tr>
         <td><?= Loc::getMessage('PLATEAM_PARTNER_OPT_REF_TOKEN') ?>:</td>
@@ -169,7 +150,6 @@ $tabControl = new CAdminTabControl('tabControl', [
         show(true, '…');
         var body = new FormData();
         body.append('sessid', <?= \Bitrix\Main\Web\Json::encode($sessId) ?>);
-        body.append('api_base', (document.getElementById('plateam_api_base') || {}).value || '');
         if (keyDirty && keyEl) {
             var keyVal = keyEl.value || '';
             if (keyVal !== '' && !/^pk_(test|live)_/i.test(keyVal)) {
@@ -200,4 +180,4 @@ $tabControl = new CAdminTabControl('tabControl', [
     });
 })();
 </script>
-<p style="margin-top:8px;color:#888;font-size:11px;">plateam.partner options build 1.1.6</p>
+<p style="margin-top:8px;color:#888;font-size:11px;">plateam.partner options build 1.1.9</p>

@@ -29,7 +29,7 @@ modules/plateam.partner  →  /local/modules/plateam.partner
 
 Удаление модуля **не** очищает настройки в `b_option` (код партнёра, промо и т.п. сохраняются). При повторной установке модуль сам:
 
-- переписывает унаследованные URL `*.demo.pla.team` → `https://pla.team` / `/api/v0` / `https://go.pla.team`;
+- записывает фиксированные URL `https://pla.team`, `https://pla.team/api/v0`, `https://go.pla.team` (в настройках их нет);
 - очищает устаревшие demo-ключи (не `pk_test_` / `pk_live_`) — вставьте актуальный ключ из ЛК;
 - добавляет свойство заказа `PLATEAM_CHECKOUT_TOKEN` (нужно для hold после security-фиксов платформы).
 
@@ -43,9 +43,6 @@ modules/plateam.partner  →  /local/modules/plateam.partner
 | --- | --- |
 | Код партнёра | выданный код |
 | API key | `pk_test_…` для проверки на сайте, затем `pk_live_…` для боя (только server-side) |
-| Origin платформы | `https://pla.team` |
-| Base URL API | `https://pla.team/api/v0` |
-| Origin go | `https://go.pla.team` |
 | Referral token | токен вашей реф-ссылки (если есть) |
 | Own / foreign promo | ваши промокоды Bitrix Sale (опционально) |
 
@@ -74,7 +71,7 @@ modules/plateam.partner  →  /local/modules/plateam.partner
 <?php $APPLICATION->IncludeComponent('plateam:checkout', '', ['MODE' => 'summary'], false); ?>
 ```
 
-Виджет грузится с `{platform_origin}/widget.js`. В сессии виджета **нет** API key — только публичные поля и короткоживущий `checkoutToken` для серверного `POST /holds`.
+Виджет грузится с `https://pla.team/widget.js`, реф-ссылки — с `https://go.pla.team`. В сессии виджета **нет** API key — только публичные поля и короткоживущий `checkoutToken` для серверного `POST /holds`.
 
 ## 4. Поведение
 
