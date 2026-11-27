@@ -1,0 +1,54 @@
+name: Release module zip
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Pack module
+        run: bash scripts/pack-marketplace.sh
+
+      - name: Read version
+        id: ver
+        run: |
+          VERSION=$(php -r 'include "modules/plateam.partner/install/version.php"; echo $arModuleVersion["VERSION"];')
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "sha=$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Publish latest release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITLE="plateam.partner ${{ steps.ver.outputs.version }}"
+          NOTES=$(cat <<EOF
+          Сборка с \`main\` (\`${{ steps.ver.outputs.sha }}\`), версия ${{ steps.ver.outputs.version }}.
+
+          Скачать: [plateam.partner.zip](https://github.com/${{ github.repository }}/releases/latest/download/plateam.partner.zip)
+
+          Установка: распаковать архив в \`/local/modules/\` (получится \`/local/modules/plateam.partner/\`), затем в админке Marketplace → Установленные решения → PLATEAM Partner → Установить.
+          EOF
+          )
+          REPO="${{ github.repository }}"
+          gh release delete latest --yes --cleanup-tag --repo "$REPO" || true
+          ok=0
+          for _ in 1 2 3 4 5; do
+            if gh release create latest dist/plateam.partner.zip \
+              --target "${{ github.sha }}" \
+              --title "$TITLE" \
+              --notes "$NOTES" \
+              --latest \
+              --repo "$REPO"; then
+              ok=1
+              break
+            fi
+            sleep 3
+          done
+          test "$ok" = 1

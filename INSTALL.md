@@ -13,17 +13,11 @@
 
 ## 1. Установка файлов
 
-**Вариант A — zip / Маркетплейс**
+1. Скачать [plateam.partner.zip](https://github.com/code-philosophy/plateam-bitrix/releases/latest/download/plateam.partner.zip) (сборка с `main`, обновляется при каждом push).
+2. Распаковать архив в `/local/modules/`. Внутри архива уже лежит папка `plateam.partner/`, поэтому путь на сайте будет `/local/modules/plateam.partner/`.
+3. Админка → Marketplace → Установленные решения → **PLATEAM Partner** → Установить.
 
-Установите решение `plateam.partner`. Компоненты попадут в `/local/components/plateam`.
-
-**Вариант B — вручную**
-
-```
-modules/plateam.partner  →  /local/modules/plateam.partner
-```
-
-Админка → Marketplace → Установленные решения → **PLATEAM Partner** → Установить.
+Компоненты при установке копируются в `/local/components/plateam`. Загрузка zip сама модуль не ставит: кнопка **Установить** регистрирует события и свойства заказа.
 
 ### Обновление (удаление → установка)
 
@@ -94,4 +88,4 @@ curl -sS -H "Authorization: Bearer <api_key>" \
 
 ## Поддержка
 
-[https://pla.team](https://pla.team) · пакет для Маркетплейса: [MARKETPLACE.md](MARKETPLACE.md)
+[https://pla.team](https://pla.team) · архив модуля: [plateam.partner.zip](https://github.com/code-philosophy/plateam-bitrix/releases/latest/download/plateam.partner.zip)

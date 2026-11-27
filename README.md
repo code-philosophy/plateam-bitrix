@@ -15,8 +15,7 @@
 
 ## Быстрый старт
 
-1. Скопировать `modules/plateam.partner` → `/local/modules/plateam.partner`  
-   (или установить zip из `scripts/pack-marketplace.sh`)
+1. Скачать [plateam.partner.zip](https://github.com/code-philosophy/plateam-bitrix/releases/latest/download/plateam.partner.zip) и распаковать в `/local/modules/` — получится `/local/modules/plateam.partner/`. Архив пересобирается на каждый push в `main`.
 2. Админка → **Marketplace → Установленные решения** → **PLATEAM Partner** → Установить  
    (компоненты копируются в `/local/components/plateam` автоматически)
 3. **Настройки модулей → PLATEAM Partner:** код партнёра и API key (`pk_test_` / `pk_live_`). Виджет и API всегда на `https://pla.team`
@@ -28,14 +27,13 @@
 ## Структура
 
 ```
-modules/plateam.partner/     ← пакет для Маркетплейса / ручной установки
+modules/plateam.partner/     ← содержимое plateam.partner.zip
   install/components/plateam/
   lib/  options.php  tools/  …
 INSTALL.md
-MARKETPLACE.md
 devtools/                    ← внутренняя отладка команды (не в zip, не партнёрский онбординг)
   plateam.php                ← список заказов с полями PLATEAM (в корень сайта на dev)
-scripts/pack-marketplace.sh
+scripts/pack-marketplace.sh  ← сборка zip; на main её запускает GitHub Actions
 ```
 
 Виджет (`widget.js`) хостится на платформе: `https://pla.team/widget.js`.

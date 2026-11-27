@@ -13,16 +13,19 @@ rm -rf "$STAGE"
 mkdir -p "$STAGE"
 cp -a "$MOD" "$STAGE/plateam.partner"
 
-# Safety: never ship devtools leftovers inside module
+# Safety: never ship devtools leftovers inside module.
+# Keep tools/test_key.php — the settings "Test key" button calls it.
 rm -rf "$STAGE/plateam.partner/tools/debug_"* \
-  "$STAGE/plateam.partner/tools/test_"* \
   "$STAGE/plateam.partner/tools/setup_demo_"* \
   "$STAGE/plateam.partner/tools/web_install.php" \
   "$STAGE/plateam.partner/tools/install_paysystem.php" 2>/dev/null || true
 
 ZIP="$OUT_DIR/${NAME}.zip"
-rm -f "$ZIP"
+STABLE="$OUT_DIR/plateam.partner.zip"
+rm -f "$ZIP" "$STABLE"
 (cd "$STAGE" && zip -r "$ZIP" plateam.partner -x '*.DS_Store' -x '*/.git/*')
+cp "$ZIP" "$STABLE"
 rm -rf "$STAGE"
 echo "Wrote $ZIP"
-ls -la "$ZIP"
+echo "Wrote $STABLE"
+ls -la "$ZIP" "$STABLE"
