@@ -19,8 +19,19 @@
 2. Админка → **Marketplace → Установленные решения** → **PLATEAM Partner** → Установить  
    (компоненты копируются в `/local/components/plateam` автоматически)
 3. **Настройки модулей → PLATEAM Partner:** код партнёра и API key (`pk_test_` / `pk_live_`). Виджет и API всегда на `https://pla.team`
-4. В шаблон: `plateam:widget`; в корзину: `plateam:checkout`
-5. Кнопка **Проверить ключ** (смотрите `keyEnv`)
+4. В шапку сайта (`header.php` шаблона) вставьте:
+
+   ```php
+   <?php $APPLICATION->IncludeComponent('plateam:widget', '', [], false); ?>
+   ```
+
+5. На страницу корзины вставьте:
+
+   ```php
+   <?php $APPLICATION->IncludeComponent('plateam:checkout', '', [], false); ?>
+   ```
+
+6. Кнопка **Проверить ключ** (смотрите `keyEnv`)
 
 Подробно: [INSTALL.md](INSTALL.md).
 

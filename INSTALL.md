@@ -44,13 +44,13 @@
 
 ## 3. Шаблон сайта
 
-В layout / footer:
+В шапку сайта (`header.php` шаблона):
 
 ```php
 <?php $APPLICATION->IncludeComponent('plateam:widget', '', [], false); ?>
 ```
 
-На странице корзины, которой реально пользуются покупатели (проверьте
+На страницу корзины, которой реально пользуются покупатели (проверьте
 `PATH_TO_BASKET` в `sale.order.ajax` — часто `/personal/cart/` и `/cart/` это
 разные URL; компонент `plateam:checkout` нужен на **той**, где оформляют заказ):
 
